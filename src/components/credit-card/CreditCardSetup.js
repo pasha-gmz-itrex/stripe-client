@@ -1,12 +1,12 @@
-import {CardElement, CardNumberElement, Elements, PaymentElement, useElements, useStripe} from "@stripe/react-stripe-js";
+import {Elements} from "@stripe/react-stripe-js";
 import React, {useEffect, useState} from "react";
 import {Button, Modal} from "react-bootstrap";
-import PaymentElementCheckout from "../payment-elments/PaymentElementCheckout";
 import {getToken} from "../../utils/TokenUtils";
 import {VAULT_SERVER_URL} from "../../constants/AppConstants";
+import CreditCardSetupForm from "./CreditCardSetupForm";
 
-const CreditCardPaymentMethod = (props) => {
-  const [clientSecret, setClientSecret] = useState("");
+const CreditCardSetup = (props) => {
+  const [setupIntentKey, setSetupIntentKey] = useState("");
 
   useEffect(() => {
     let isSubscribed = true;
@@ -25,7 +25,7 @@ const CreditCardPaymentMethod = (props) => {
           .then((data) => {
             console.log(data);
             if (isSubscribed) {
-              setClientSecret(data.setupIntentKey)
+              setSetupIntentKey(data.setupIntentKey)
             }
           });
       })
@@ -34,7 +34,7 @@ const CreditCardPaymentMethod = (props) => {
   }, []);
 
   const options = {
-    clientSecret,
+    clientSecret: setupIntentKey,
     appearance: {
       theme: 'stripe',
     },
@@ -47,9 +47,9 @@ const CreditCardPaymentMethod = (props) => {
       </Modal.Header>
       <Modal.Body>
         {
-          clientSecret && (
+          setupIntentKey && (
             <Elements options={options} stripe={props.stripePromise}>
-              <PaymentElementCheckout clientSecret={clientSecret} handleClose={props.handleClose}/>
+              <CreditCardSetupForm setupIntentKey={setupIntentKey} handleClose={props.handleClose}/>
             </Elements>
           )
         }
@@ -60,4 +60,4 @@ const CreditCardPaymentMethod = (props) => {
   );
 }
 
-export default CreditCardPaymentMethod;
+export default CreditCardSetup;

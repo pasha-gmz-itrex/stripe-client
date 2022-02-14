@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
+import {JAVA_SERVER_URL} from "../../constants/AppConstants";
 
 const StandardCheckout = (props) => {
 
@@ -9,7 +10,7 @@ const StandardCheckout = (props) => {
     <div>
       {
         id &&
-        <form action="http://localhost:8080/checkout/create-session/" method="POST">
+        <form action={JAVA_SERVER_URL + "/checkout/create-session/"} method="POST">
           <label id = "productTitle"
             placeholder="Product Title"
           >

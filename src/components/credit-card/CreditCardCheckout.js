@@ -1,5 +1,3 @@
-import CreditCardPaymentMethod from "./CreditCardPaymentMethod";
-
 import React, {useEffect, useState} from "react";
 import {Form, Modal} from "react-bootstrap";
 import {Button} from "react-bootstrap"
@@ -8,8 +6,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import {loadStripe} from "@stripe/stripe-js";
 import {useElements, useStripe} from "@stripe/react-stripe-js";
-import {STRIPE_PK, VAULT_SERVER_URL} from "../../constants/AppConstants";
+import {SALE_SERVER_URL, STRIPE_PK, VAULT_SERVER_URL} from "../../constants/AppConstants";
 import {getToken} from "../../utils/TokenUtils";
+import CreditCardSetup from "./CreditCardSetup";
 
 const stripePromise = loadStripe(STRIPE_PK);
 
@@ -31,57 +30,37 @@ const CreditCardCheckout = (props) => {
   const handleAddCard = () => setShow(true);
 
   const handleClose = () => {
-    // var myHeaders = new Headers();
-    // myHeaders.append("X-Device", "web/12.0");
-    // myHeaders.append("Authorization", "Basic bWVldG1lOnNlY3JldA==");
-    // myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-    // myHeaders.append("Cookie", "COOK_INDICATOR=1; COOK_USERID=CzVSNAdlXWADMlc2BDUDOQ%3D%3D; PHPSESSID=25d08001f88161eb2b58e1d5e947ff35");
-    //
-    // var urlencoded = new URLSearchParams();
-    // urlencoded.append("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange");
-    // urlencoded.append("subject_token", "25d08001f88161eb2b58e1d5e947ff35");
-    // urlencoded.append("subject_token_type", "urn:ietf:params:oauth:token-type:session");
-    // var requestOptions = {
-    //   method: 'POST',
-    //   headers: myHeaders,
-    //   body: urlencoded,
-    //   redirect: 'follow'
-    // };
-    //
-    // fetch("http://auth.gateway.pgomza.dev2.use1.amz.mtmetest.com/oauth/token", requestOptions)
-    //   .then(response => response.json())
-    //   .then((res) =>
-    //     fetch("http://localhost:8081/vault/credit-cards?provider=stripe", {
-    //       method: "GET",
-    //       headers: {
-    //         "Accept": "application/json",
-    //         "Content-Type": "application/json",
-    //         "Access-Control-Allow-Origin": "*",
-    //         "Authorization": "Bearer " + res.access_token,
-    //       },
-    //     })
-    //       .then((res) => res.json())
-    //       .then((res) => {
-    //         // setPaymentMethods(data);
-    //         // var cards = res.cards;
-    //         const methods = res.map(it => { return {"key": it.id, "value": it.name } } );
-    //         setPaymentMethods(Array.from(new Set(methods)));
-    //       })
-    //   )
-    //
-    // setShow(false);
+    getToken().then((res) =>
+        fetch(VAULT_SERVER_URL + "/vault/credit-cards?provider=stripe", {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Authorization": "Bearer " + res.access_token,
+          },
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            const cards = res.map(it => { return {"key": it.id, "value": it.name } } );
+            setCards(Array.from(new Set(cards)));
+          })
+      )
+
+    setShow(false);
   }
 
   const handlePay = () => {
     setPaymentProcess(true);
 
     getToken().then((res) => {
+      console.log("handle pay");
 
-        var headers = new Headers();
+        const headers = new Headers();
         headers.append("Accept",  "application/json");
         headers.append("Content-Type",  "application/json");
         headers.append("Authorization",  "Bearer " + res.access_token);
-        fetch("http://localhost:8081/sale/stripe/authorize", {
+        fetch(SALE_SERVER_URL + "/sale/stripe/authorize", {
           method: "POST",
           headers: headers,
           body: JSON.stringify({
@@ -141,12 +120,15 @@ const CreditCardCheckout = (props) => {
 
   const handleReauthorize = (paymentIntentId) => {
 
+
+    console.log("reauthorize");
+
     getToken().then((res) => {
         const headers = new Headers();
         headers.append("Accept",  "application/json");
         headers.append("Content-Type",  "application/json");
         headers.append("Authorization",  "Bearer " + res.access_token);
-        return fetch("http://localhost:8081/sale/stripe/authorize/" + paymentIntentId, {
+        return fetch(SALE_SERVER_URL + "/sale/stripe/authorize/" + paymentIntentId, {
           method: "PATCH",
           headers: headers,
           body: JSON.stringify({
@@ -242,7 +224,7 @@ const CreditCardCheckout = (props) => {
           </div>
       }
 
-      <CreditCardPaymentMethod
+      <CreditCardSetup
         show={show}
         handleClose={handleClose}
         stripePromise={stripePromise}

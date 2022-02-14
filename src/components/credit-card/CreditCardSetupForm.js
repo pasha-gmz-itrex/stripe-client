@@ -1,47 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   PaymentElement,
   useStripe,
   useElements
 } from "@stripe/react-stripe-js";
 
-const PaymentElementCheckoutForm = () => {
+const CreditCardSetupForm = (props) => {
   const stripe = useStripe();
   const elements = useElements();
 
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (!stripe) {
-      return;
-    }
-
-    const clientSecret = new URLSearchParams(window.location.search).get(
-      "payment_intent_client_secret"
-    );
-
-    if (!clientSecret) {
-      return;
-    }
-
-    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-      switch (paymentIntent.status) {
-        case "succeeded":
-          setMessage("Payment succeeded!");
-          break;
-        case "processing":
-          setMessage("Your payment is processing.");
-          break;
-        case "requires_payment_method":
-          setMessage("Your payment was not successful, please try again.");
-          break;
-        default:
-          setMessage("Something went wrong.");
-          break;
-      }
-    });
-  }, [stripe]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,11 +23,11 @@ const PaymentElementCheckoutForm = () => {
 
     setIsLoading(true);
 
-    const { error } = await stripe.confirmPayment({
+    const { error } = await stripe.confirmSetup({
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: "http://localhost:3000/purchase/f6f0e54c-0e86-4da0-a262-ef9cc60f899b/payment-element#",
+        return_url: "http://localhost:3000/purchase/f6f0e54c-0e86-4da0-a262-ef9cc60f899b/credit-card",
       },
     });
 
@@ -80,7 +49,7 @@ const PaymentElementCheckoutForm = () => {
       <PaymentElement id="payment-element" />
       <button disabled={isLoading || !stripe || !elements} id="submit">
         <span id="button-text">
-          {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
+          {isLoading ? <div className="spinner" id="spinner"></div> : "Create a new card"}
         </span>
       </button>
       {/* Show any error or success messages */}
@@ -89,4 +58,4 @@ const PaymentElementCheckoutForm = () => {
   );
 }
 
-export default PaymentElementCheckoutForm;
+export default CreditCardSetupForm;
