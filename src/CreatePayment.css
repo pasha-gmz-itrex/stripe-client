@@ -1,6 +1,6 @@
 #root {
     display: flex;
-    /*align-items: center;*/
+    align-items: center;
 }
 
 body {
@@ -74,7 +74,7 @@ button:disabled {
     color: #ffffff;
     font-size: 22px;
     text-indent: -99999px;
-    margin: 20px auto;
+    margin: 0px auto;
     position: relative;
     width: 20px;
     height: 20px;
@@ -132,64 +132,4 @@ button:disabled {
         width: 80vw;
         min-width: initial;
     }
-}
-
-.purchase {
-}
-
-.purchase-title {
-    font-size: 24px;
-    color: #797a7b9c;
-}
-
-.purchase-product {
-}
-
-.purchase-product-title {
-    font-size: 24px;
-    color: #797a7b9c;
-}
-
-
-.product-description {
-    margin-bottom: 20px;
-    font-size: 42px;
-}
-
-.payment-methods-group {
-    width: 350px;
-    margin: 0 auto;
-}
-
-.payment-methods-title {
-    justify-content: center;
-    display: flex;
-    color: #7c7d79;
-}
-
-.payment-methods-control {
-    color: #7c7d79;
-    font-size: 14px;
-    text-align-last: center;
-}
-
-.btn-new-payment-method {
-    margin: 20px auto;
-    width: 350px;
-}
-
-.btn-new-payment-method button {
-    /*background-color: #676a6f;*/
-    /*border-color: #676a6f;*/
-}
-
-.mdl-create-payment-method-title {
-    margin-left: 25%;
-    color: #7b7b7b;
-}
-
-.result-message {
-    margin: 20px auto;
-    width: 350px;
-    text-align: center;
 }
